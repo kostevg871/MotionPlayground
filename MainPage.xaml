@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:MotionPlayground.ViewModels"
+    x:Class="MotionPlayground.MainPage"
+    Title="Motion Playground"
+    BackgroundColor="{Binding PageBackground}">
+
+    <ContentPage.BindingContext>
+        <vm:MainViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowSpacing="14" Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Text="Motion Playground"
+               FontSize="26"
+               FontAttributes="Bold"
+               TextColor="{Binding Foreground}"
+               HorizontalTextAlignment="Center"/>
+
+        <Label Grid.Row="0"
+               Margin="0,30,0,0"
+               Text="Выберите анимацию, тему и скорость"
+               TextColor="{Binding Foreground}"
+               Opacity="0.8"
+               HorizontalTextAlignment="Center"/>
+
+        <!-- Сцена -->
+        <Grid Grid.Row="1" HeightRequest="280">
+            <Frame x:Name="Stage"
+                   CornerRadius="24"
+                   Padding="0"
+                   HasShadow="True"
+                   BackgroundColor="#00000000">
+                <Grid>
+                    <Frame CornerRadius="3000"
+                           HeightRequest="220"
+                           WidthRequest="220"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           BackgroundColor="{Binding Accent2}"
+                           Opacity="0.25"
+                           InputTransparent="True"/>
+
+                    <Grid x:Name="ActorContainer"
+                          HeightRequest="180"
+                          WidthRequest="180"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center">
+
+                        <Frame IsVisible="{Binding ShowCircle}"
+                               BackgroundColor="{Binding Accent}"
+                               CornerRadius="9999"
+                               HeightRequest="180"
+                               WidthRequest="180"
+                               HasShadow="False"
+                               InputTransparent="True"/>
+
+                        <Frame IsVisible="{Binding ShowSquare}"
+                               BackgroundColor="{Binding Accent}"
+                               CornerRadius="22"
+                               HeightRequest="180"
+                               WidthRequest="180"
+                               HasShadow="False"
+                               InputTransparent="True"/>
+                    </Grid>
+                </Grid>
+            </Frame>
+        </Grid>
+
+        <!-- Тема/скорость -->
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Picker Grid.Column="0"
+                    Title="Тема"
+                    SelectedItem="{Binding SelectedTheme}"
+                    ItemsSource="{Binding Themes}" />
+
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                <Label Text="Скорость"
+                       FontSize="12"
+                       TextColor="{Binding Foreground}"
+                       HorizontalTextAlignment="Center"/>
+                <Label Text="{Binding SpeedMultiplier, StringFormat='x{0:F1}'}"
+                       FontSize="14"
+                       TextColor="{Binding Foreground}"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <Slider Grid.Column="2"
+                    Minimum="0.5"
+                    Maximum="3"
+                    Value="{Binding SpeedMultiplier}"/>
+        </Grid>
+
+        <!-- Анимации -->
+        <VerticalStackLayout Grid.Row="3" Spacing="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Text="Анимации"
+                       FontAttributes="Bold"
+                       TextColor="{Binding Foreground}"/>
+
+                <HorizontalStackLayout Grid.Column="1" Spacing="10">
+                    <Switch IsToggled="{Binding CombineRotatePulse}"/>
+                    <Label Text="Комбинировать: Вращение + Пульс"
+                           VerticalTextAlignment="Center"
+                           TextColor="{Binding Foreground}"/>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <CollectionView x:Name="AnimationsCV"
+                            ItemsSource="{Binding Animations}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedAnimation, Mode=TwoWay}"
+                            SelectionChanged="OnAnimationsSelectionChanged"
+                            HeightRequest="90">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                </CollectionView.ItemsLayout>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- ВАЖНО: InputTransparent="True", иначе Frame часто съедает tap -->
+                        <Frame Padding="12,8"
+                               CornerRadius="16"
+                               HasShadow="False"
+                               BackgroundColor="#1F2937"
+                               InputTransparent="True">
+                            <HorizontalStackLayout Spacing="10" InputTransparent="True">
+                                <Frame WidthRequest="16"
+                                       HeightRequest="16"
+                                       CornerRadius="8"
+                                       Padding="0"
+                                       HasShadow="False"
+                                       BackgroundColor="{Binding PreviewColor}"
+                                       InputTransparent="True" />
+                                <Label Text="{Binding Name}"
+                                       TextColor="White"
+                                       InputTransparent="True"/>
+                            </HorizontalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0"
+                        Text="Старт"
+                        Command="{Binding StartCommand}"
+                        CornerRadius="18"
+                        Padding="18,12"
+                        BackgroundColor="{Binding Accent}"
+                        TextColor="Black"/>
+
+                <Button Grid.Column="1"
+                        Text="Стоп"
+                        Command="{Binding StopCommand}"
+                        CornerRadius="18"
+                        Padding="18,12"
+                        BackgroundColor="#CBD5E1"
+                        TextColor="#0F172A"/>
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

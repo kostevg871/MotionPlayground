@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- .NET 10 MAUI (Android + Windows). Add iOS/MacCatalyst only if you really need them. -->
+    <TargetFrameworks>net10.0-android;net10.0-windows10.0.19041.0</TargetFrameworks>
+
+    <OutputType>Exe</OutputType>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+
+    <RootNamespace>MotionPlayground</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <ApplicationTitle>MotionPlayground</ApplicationTitle>
+    <ApplicationId>com.companyname.motionplayground</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+  </PropertyGroup>
+
+  <!-- Make sure XAML gets compiled as MAUI XAML so InitializeComponent() is generated -->
+  <ItemGroup>
+    <MauiXaml Update="**\*.xaml" />
+<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
+
+  </ItemGroup>
+
+  <!-- If you target only Android+Windows, exclude other platform folders to avoid accidental compilation -->
+  <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+    <Compile Remove="Platforms\Windows\**\*.cs" />
+    <None Remove="Platforms\Windows\**\*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <Compile Remove="Platforms\Android\**\*.cs" />
+    <None Remove="Platforms\Android\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Maui.Controls" Version="10.0.11" />
+  </ItemGroup>
+
+</Project>
