@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Hosting;
 
+#if ANDROID
+using Microsoft.Maui.Handlers;
+#endif
 
 namespace MotionPlayground
 {
@@ -9,6 +11,7 @@ namespace MotionPlayground
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -18,7 +21,15 @@ namespace MotionPlayground
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
+#endif
+
+#if ANDROID
+            WebViewHandler.Mapper.AppendToMapping("EnableJs", (handler, view) =>
+            {
+                var s = handler.PlatformView.Settings;
+                s.JavaScriptEnabled = true;
+            });
 #endif
 
             return builder.Build();

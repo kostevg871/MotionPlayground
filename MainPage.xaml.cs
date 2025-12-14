@@ -45,7 +45,6 @@ namespace MotionPlayground
         {
             if (BindingContext is not MainViewModel vm) return;
 
-            // ВАЖНО: тип берём Models.AnimationItem
             var picked = e.CurrentSelection?.FirstOrDefault() as AnimationItem;
             if (picked != null && picked != vm.SelectedAnimation)
                 vm.SelectedAnimation = picked;

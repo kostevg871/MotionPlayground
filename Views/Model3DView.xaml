@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MotionPlayground.Views.Model3DView">
+
+    <Grid>
+        <WebView x:Name="ModelWebView" />
+
+        <!-- Если 3D не загрузился — покажем подсказку -->
+        <Label x:Name="ErrorLabel"
+               IsVisible="False"
+               Text="3D не загрузился (проверь model-viewer.min.js и поддержку WebGL)"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               TextColor="White"
+               BackgroundColor="#AA000000"
+               Padding="12"/>
+    </Grid>
+</ContentView>

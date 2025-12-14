@@ -15,6 +15,30 @@ namespace MotionPlayground.ViewModels
         public VisualElement Actor { get; set; }
         public Frame Stage { get; set; }
 
+        // ---- 2D / 3D ----
+        private bool _use3D;
+        public bool Use3D
+        {
+            get => _use3D;
+            set
+            {
+                if (Set(ref _use3D, value))
+                {
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Is2DVisible)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Is3DVisible)));
+
+                    // 2D фигуры обновим (для 3D это просто скрыто)
+                    ApplyShape();
+
+                    // перезапуск анимации, чтобы сразу увидеть эффект
+                    if (Actor != null) _ = StartAsync();
+                }
+            }
+        }
+
+        public bool Is2DVisible => !Use3D;
+        public bool Is3DVisible => Use3D;
+
         public ObservableCollection<string> Themes { get; } = new() { "Dark", "Neon", "Pastel" };
 
         private string _selectedTheme = "Neon";
@@ -45,7 +69,7 @@ namespace MotionPlayground.ViewModels
         private bool _showCircle = true;
         public bool ShowCircle { get => _showCircle; set => Set(ref _showCircle, value); }
 
-        private bool _showSquare = false;
+        private bool _showSquare;
         public bool ShowSquare { get => _showSquare; set => Set(ref _showSquare, value); }
 
         public ObservableCollection<AnimationItem> Animations { get; } = new()
@@ -67,9 +91,7 @@ namespace MotionPlayground.ViewModels
                 {
                     ApplyStageBackground(animated: true);
                     ApplyShape();
-
-                    if (Actor != null)
-                        _ = StartAsync();
+                    if (Actor != null) _ = StartAsync();
                 }
             }
         }
@@ -137,6 +159,7 @@ namespace MotionPlayground.ViewModels
         {
             if (Actor == null) return;
 
+            // ВАЖНО: вращаем сам контейнер — одинаково для 2D и 3D (минимальные изменения)
             var anim = new Microsoft.Maui.Controls.Animation(v => Actor.Rotation = v, 0, 360, Easing.Linear);
             StartInfiniteAnimation("rotate", anim, (uint)(3000 / Math.Max(0.1, SpeedMultiplier)));
         }
@@ -225,11 +248,8 @@ namespace MotionPlayground.ViewModels
         {
             var stage = Stage;
             var selected = SelectedAnimation;
+            if (stage == null || selected == null) return;
 
-            if (stage == null || selected == null)
-                return;
-
-            // ВАЖНО: подстрахуем оба цвета
             var to = selected.StageBackground ?? Colors.Transparent;
             var from = stage.BackgroundColor ?? Colors.Transparent;
 
@@ -241,7 +261,6 @@ namespace MotionPlayground.ViewModels
 
             var anim = new Microsoft.Maui.Controls.Animation(v =>
             {
-                // если страница уже ушла и Stage отцепился от handler'а — просто выходим
                 if (stage.Handler == null) return;
 
                 stage.BackgroundColor = Color.FromRgba(
@@ -257,12 +276,11 @@ namespace MotionPlayground.ViewModels
 
         private void ApplyShape()
         {
+            // Если включили 3D — 2D фигуры всё равно скрыты, но оставим логику корректной
             if (SelectedAnimation == null) return;
 
             ShowCircle = SelectedAnimation.ShapeKey == "circle";
             ShowSquare = SelectedAnimation.ShapeKey == "square";
-
-            if (Actor != null) Actor.Rotation = 0;
         }
 
         private void StartInfiniteAnimation(string key, Microsoft.Maui.Controls.Animation animation, uint length = 1000, uint rate = 24)
@@ -295,7 +313,6 @@ namespace MotionPlayground.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // !!! ВАЖНО: Set находится ВНУТРИ класса, а не сверху файла !!!
         protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value)) return false;

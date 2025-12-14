@@ -18,6 +18,14 @@
     <ApplicationVersion>1</ApplicationVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Resources\Raw\model-viewer.min.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+  <MauiAsset Include="Resources\Raw\rubiks_cube.glb" LogicalName="rubiks_cube.glb" />
+</ItemGroup>
+
   <!-- Make sure XAML gets compiled as MAUI XAML so InitializeComponent() is generated -->
   <ItemGroup>
     <MauiXaml Update="**\*.xaml" />
@@ -37,7 +45,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Model3DView.xaml.cs">
+      <DependentUpon>Model3DView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Update="Microsoft.Maui.Controls" Version="10.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <MauiXaml Update="Views\Model3DView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
   </ItemGroup>
 
 </Project>
