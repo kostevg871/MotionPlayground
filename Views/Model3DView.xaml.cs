@@ -51,12 +51,16 @@ namespace MotionPlayground.Views
   </model-viewer>
 
   <script>
+    // Вращаем МОДЕЛЬ (ориентация), а не камеру:
+    // orientation = 'xdeg ydeg zdeg'
     window.setYaw = function(deg) {{
       const mv = document.getElementById('mv');
       if (!mv) return;
-      mv.cameraOrbit = deg + 'deg 75deg 2.5m';
+      mv.orientation = '0deg ' + deg + 'deg 0deg';
     }};
-    window.resetYaw = function() {{ window.setYaw(0); }};
+    window.resetYaw = function() {{
+      window.setYaw(0);
+    }};
   </script>
 </body>
 </html>";

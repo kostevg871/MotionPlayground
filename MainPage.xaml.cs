@@ -15,6 +15,7 @@ namespace MotionPlayground
             {
                 vm.Actor = ActorContainer;
                 vm.Stage = Stage;
+                vm.ModelView = ModelView;
 
                 if (vm.SelectedAnimation == null && vm.Animations.Count > 0)
                     vm.SelectedAnimation = vm.Animations[0];

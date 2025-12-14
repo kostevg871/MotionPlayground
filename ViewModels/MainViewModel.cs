@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using MotionPlayground.Models;
+using MotionPlayground.Views;
 
 namespace MotionPlayground.ViewModels
 {
@@ -14,6 +15,9 @@ namespace MotionPlayground.ViewModels
     {
         public VisualElement Actor { get; set; }
         public Frame Stage { get; set; }
+
+        public Model3DView ModelView { get; set; }
+
 
         // ---- 2D / 3D ----
         private bool _use3D;
@@ -159,10 +163,27 @@ namespace MotionPlayground.ViewModels
         {
             if (Actor == null) return;
 
-            // ВАЖНО: вращаем сам контейнер — одинаково для 2D и 3D (минимальные изменения)
+            // Если включен 3D — вращаем саму модель через JS
+            if (Use3D && ModelView != null)
+            {
+                var anim3d = new Microsoft.Maui.Controls.Animation(v => ModelView.SetYaw(v), 0, 360, Easing.Linear);
+                anim3d.Commit(
+                    owner: Actor,
+                    name: "rotate",
+                    rate: 24,
+                    length: (uint)(3000 / Math.Max(0.1, SpeedMultiplier)),
+                    easing: Easing.Linear,
+                    finished: (v, c) => { },
+                    repeat: () => true
+                );
+                return;
+            }
+
+            // Иначе — старое вращение контейнера (2D)
             var anim = new Microsoft.Maui.Controls.Animation(v => Actor.Rotation = v, 0, 360, Easing.Linear);
             StartInfiniteAnimation("rotate", anim, (uint)(3000 / Math.Max(0.1, SpeedMultiplier)));
         }
+
 
         private void RunSlide(CancellationToken token)
         {
@@ -215,6 +236,10 @@ namespace MotionPlayground.ViewModels
                 Actor.TranslationX = 0;
                 Actor.TranslationY = 0;
             }
+
+            if (Use3D && ModelView != null)
+                ModelView.ResetYaw();
+
         }
 
         private void ApplyTheme()

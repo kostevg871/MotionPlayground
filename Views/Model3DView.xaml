@@ -5,7 +5,8 @@
     x:Class="MotionPlayground.Views.Model3DView">
 
     <Grid>
-        <WebView x:Name="ModelWebView" />
+        <WebView x:Name="ModelWebView"
+         BackgroundColor="Transparent" />
 
         <!-- Если 3D не загрузился — покажем подсказку -->
         <Label x:Name="ErrorLabel"
